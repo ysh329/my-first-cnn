@@ -30,10 +30,10 @@ class ReadRawData(object):
         self.start = time.clock()
 
         logging.basicConfig(level = logging.INFO,
-                  format = '%(asctime)s  %(levelname)5s %(filename)19s[line:%(lineno)3d] %(funcName)s %(message)s',
-                  datefmt = '%y-%m-%d %H:%M:%S',
-                  filename = './my-first-cnn.log',
-                  filemode = 'a')
+                            format = '%(asctime)s  %(levelname)5s %(filename)19s[line:%(lineno)3d] %(funcName)s %(message)s',
+                            datefmt = '%y-%m-%d %H:%M:%S',
+                            filename = './my-first-cnn.log',
+                            filemode = 'a')
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
 
@@ -56,6 +56,7 @@ class ReadRawData(object):
     @Decorator.log_of_function
     def load_image_data_set(self, img_data_dir):
         logging.info("Load image data set from {0}.".format(img_data_dir))
+
 
         with open(img_data_dir, "rb") as binary_file_handle:
             image_data_buffer = binary_file_handle.read()
@@ -117,21 +118,25 @@ class ReadRawData(object):
         logging.info("all_label_2d_ndarray[0][0]:{0}".format(all_label_2d_ndarray[0][0]))
         logging.info("type(all_label_2d_ndarray[0][0]):{0}".format(type(all_label_2d_ndarray[0][0])))
 
-        #print labels
         logging.info("Load label finished.")
         return all_label_2d_ndarray
 
 
+    @Decorator.log_of_function
+    def get_img_size(self, some_img_ndarray):
+        img_shape_tuple = some_img_ndarray.shape
+        logging.info("img_shape_tuple:{0}".format(img_shape_tuple))
+        return img_shape_tuple
+
 
 ################################### PART3 CLASS TEST ##################################
-#'''
+'''
 # Initialization
 train_sample_data_dir = "..//data//input//train-images-idx3-ubyte"
 train_label_data_dir = "..//data//input//train-labels-idx1-ubyte"
 
 
-
 DataReader = ReadRawData()
 image_2d_ndarray = DataReader.load_image_data_set(img_data_dir = train_sample_data_dir)
-image_label = DataReader.load_label_data_set(label_data_dir = train_label_data_dir)
-#'''
+label_2d_ndarray = DataReader.load_label_data_set(label_data_dir = train_label_data_dir)
+'''
