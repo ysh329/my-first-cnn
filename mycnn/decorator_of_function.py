@@ -57,7 +57,7 @@ Decorator = CreateDecorator()
 def fun_a(n):
     logging.info("This is {0} from function a.".format(n))
     return n
-'''''
+'''
 ################################### PART3 CLASS TEST ##################################
 '''
 n = fun_a(11)
