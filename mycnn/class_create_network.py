@@ -140,7 +140,13 @@ class CreateNetwork(object):
 
         def calculate_conv_matrix_according_to_start_conv_coordinate(start_conv_coordinate_tuple_list_in_origin_matrix, input_matrix, conv_operator_array):
             input_matrix = np.mat(input_matrix)
-            conv_operator_height, conv_operator_width = conv_operator_array.shape
+            conv_operator_matrix = np.mat(conv_operator_array)
+            logging.info("conv_operator_matrix:{0}".format(conv_operator_matrix))
+            logging.info("input_matrix:{0}".format(input_matrix))
+
+            conv_operator_height, conv_operator_width = conv_operator_matrix.shape
+            logging.info("conv_operator_matrix.height:{0}".format(conv_operator_height))
+            logging.info("conv_operator_width:{0}".format(conv_operator_width))
 
             # Initialize a convolution matrix
             #conv_input_matrix = np.ones((new_conv_matrix_height, new_conv_matrix_width))
@@ -148,9 +154,20 @@ class CreateNetwork(object):
 
             for start_coord_tuple_idx in xrange(len(start_conv_coordinate_tuple_list_in_origin_matrix)):
                 start_coord_tuple = start_conv_coordinate_tuple_list_in_origin_matrix[start_coord_tuple_idx]
+                logging.info("start_coord_tuple:{0}".format(start_coord_tuple))
+
                 start_coord_height = start_coord_tuple[0]
+                end_coord_height = start_coord_height+conv_operator_height #+1(dont need plus 1, because operator starts from 1)
                 start_coord_width = start_coord_tuple[1]
-                conv_value = input_matrix[start_coord_height:start_coord_height+conv_operator_height+1, start_coord_width+conv_operator_width+1].dot(conv_operator_array).sum()
+                end_coord_width = start_coord_width+conv_operator_width #+1(dont need plus 1, because operator starts from 1)
+                conv_value = input_matrix[start_coord_height:end_coord_height, start_coord_width:end_coord_width]
+                logging.info("conv_value:{0}".format(conv_value))
+                break
+                """
+                conv_value = input_matrix[start_coord_height:end_coord_height, start_coord_width:end_coord_width]\
+                    .dot(conv_operator_matrix)\
+                    .sum()
+                """
                 conv_input_list.append(conv_value)
 
             conv_input_matrix = np\
@@ -186,7 +203,7 @@ class CreateNetwork(object):
 train_sample_data_dir = "..//data//input//train-images-idx3-ubyte"
 train_label_data_dir = "..//data//input//train-labels-idx1-ubyte"
 img_save_dir = "../data/output"
-img_filename = "raw-.jpg"
+img_filename = "raw-tanh-conv.jpg"
 
 # Get data and one image matrix
 Net = CreateNetwork()
@@ -197,16 +214,17 @@ input_matrix = all_image_2d_ndarray[0]
 # convolution
 input_matrix = Net.tanh_function(input_matrix = input_matrix)
 
-Net.convolution(input_matrix = input_matrix)
+conv_input_matrix = Net.convolution(input_matrix = input_matrix)
 
-'''
+
+
 Painter = PaintNDarray()
 Painter.paint_one_img(img_ndarray = input_matrix)
 Painter.save_one_img(img_ndarray = input_matrix,\
                      img_save_dir = img_save_dir,\
                      img_filename = img_filename,\
                      img_shape_tuple = input_matrix.shape)
-'''
+
 
 
 #'''
