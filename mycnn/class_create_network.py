@@ -105,8 +105,8 @@ class CreateNetwork(object):
 
 
     @Decorator.log_of_function
-    def convolution(self, input_matrix, convolution_operator_array = np.array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])):
-        conv_operator_shape_tuple = convolution_operator_array.shape
+    def convolution(self, input_matrix, conv_operator_array = np.array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])):
+        conv_operator_shape_tuple = conv_operator_array.shape
         conv_operator_height = conv_operator_shape_tuple[0]
         conv_operator_width = conv_operator_shape_tuple[1]
 
@@ -116,7 +116,8 @@ class CreateNetwork(object):
 
         if input_matrix_height <= conv_operator_height or input_matrix_width <= conv_operator_width:
             logging.error("The input matrix({0}) can't execute convolution({1}) progress.".format(input_matrix_shape_tuple, conv_operator_shape_tuple))
-            return None
+            unconv_input_matrix = input_matrix
+            return unconv_input_matrix
 
         # initialization
         new_conv_matrix_height = input_matrix_height - conv_operator_height + 1
@@ -137,10 +138,36 @@ class CreateNetwork(object):
         logging.info("start_conv_coordinate_tuple_list_in_origin_matrix:{0}".format(start_conv_coordinate_tuple_list_in_origin_matrix))
         logging.info("len(start_conv_coordinate_tuple_list_in_origin_matrix):{0}".format(len(start_conv_coordinate_tuple_list_in_origin_matrix)))
 
-        def calculate_conv_matrix_according_to_start_conv_coordinate(start_conv_coordinate_tuple_list_in_origin_matrix, input_matrix):
-            # initialize a convolution matrix
-            conv_input_matrix = np.ones((new_conv_matrix_height, new_conv_matrix_width))
+        def calculate_conv_matrix_according_to_start_conv_coordinate(start_conv_coordinate_tuple_list_in_origin_matrix, input_matrix, conv_operator_array):
+            input_matrix = np.mat(input_matrix)
+            conv_operator_height, conv_operator_width = conv_operator_array.shape
+
+            # Initialize a convolution matrix
+            #conv_input_matrix = np.ones((new_conv_matrix_height, new_conv_matrix_width))
+            conv_input_list = list()
+
+            for start_coord_tuple_idx in xrange(len(start_conv_coordinate_tuple_list_in_origin_matrix)):
+                start_coord_tuple = start_conv_coordinate_tuple_list_in_origin_matrix[start_coord_tuple_idx]
+                start_coord_height = start_coord_tuple[0]
+                start_coord_width = start_coord_tuple[1]
+                conv_value = input_matrix[start_coord_height:start_coord_height+conv_operator_height+1, start_coord_width+conv_operator_width+1].dot(conv_operator_array).sum()
+                conv_input_list.append(conv_value)
+
+            conv_input_matrix = np\
+                .mat(conv_input_list)\
+                .reshape(new_conv_matrix_height,\
+                         new_conv_matrix_width)
+
             return conv_input_matrix
+
+
+        conv_input_matrix = calculate_conv_matrix_according_to_start_conv_coordinate(\
+            start_conv_coordinate_tuple_list_in_origin_matrix = start_conv_coordinate_tuple_list_in_origin_matrix,\
+            input_matrix = input_matrix,\
+            conv_operator_array = conv_operator_array)
+
+        return conv_input_matrix
+
 
 
 
