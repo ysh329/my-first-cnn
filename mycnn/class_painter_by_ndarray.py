@@ -144,20 +144,44 @@ class PaintNDarray(object):
         subplot_figure = plt.figure()
 
         # calculate all images'subplot
+        """
         subplot_plt_list = []
         for img_idx in xrange(len(img_ndarray_list)):
             third_subplot_num = img_idx + 1
             subplot_plt_list.append(subplot_figure.\
                                     add_subplot(first_subplot_num, second_subplot_num, third_subplot_num)\
                                     )
+        """
+        subplot_plt_list = map(lambda img_idx:\
+                                   subplot_figure.add_subplot(first_subplot_num,\
+                                                              second_subplot_num,\
+                                                              (img_idx+1),\
+                                                              ),\
+                               xrange(len(img_ndarray_list)),\
+                               )
+
         # imshow all images'subplot
+        """
         for img_idx in xrange(len(img_ndarray_list)):
             img_subplot_plt = subplot_plt_list[img_idx]
             img_title = img_name_list[img_idx]
             img_ndarray = img_ndarray_list[img_idx]
 
             img_subplot_plt.imshow(img_ndarray, cmap = 'gray', interpolation = 'nearest')
-            #img_subplot_plt.set_title(img_title)
+            img_subplot_plt.set_title(img_title)
+        """
+        map(lambda img_subplot_plt, img_ndarray, img_name:\
+                img_subplot_plt.imshow(img_ndarray, cmap = 'gray', interpolation = 'nearest'),\
+            subplot_plt_list,\
+            img_ndarray_list,\
+            img_name_list\
+            )
+
+        # set titles
+        map(lambda img_subplot_plt, img_name:\
+                img_subplot_plt.set_title(img_name),\
+            subplot_plt_list,\
+            img_name_list)
 
         plt.show()
         #subplot_plt_list = map()
@@ -199,7 +223,7 @@ test_img_filename = "test.jpg"
 # test_img_ndarray
 img_ndarray = np.ndarray(shape = (30, 20), dtype = float)
 img_ndarray_list = [img_ndarray, img_ndarray, img_ndarray, img_ndarray, img_ndarray, img_ndarray]
-img_name_list = ["1", "2", "2", "2", "2", "2"]
+img_name_list = ["1", "2", "3", "4", "5", "6"]
 
 
 Painter = PaintNDarray()
