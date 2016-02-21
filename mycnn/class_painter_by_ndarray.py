@@ -215,7 +215,7 @@ class PaintNDarray(object):
                               img_shape_tuple = img_shape_tuple)
 
 ################################### PART3 CLASS TEST ##################################
-#'''
+'''
 # Initialization
 train_sample_data_dir = "..//data//input//train-images-idx3-ubyte"
 train_label_data_dir = "..//data//input//train-labels-idx1-ubyte"
@@ -238,4 +238,4 @@ Painter.paint_img_sequence(img_ndarray_list = img_ndarray_list,\
 #Painter.save_one_img(img_ndarray = img_ndarray, img_save_dir = img_save_dir, img_filename = test_img_filename)
 #Painter.paint_one_img(img_ndarray = img_ndarray)
 
-#'''
+'''
