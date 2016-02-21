@@ -67,7 +67,7 @@ class PaintNDarray(object):
 
 
     @Decorator.log_of_function
-    def paint_img_sequence(self, img_ndarray_list, img_name_list, dpi, max_img_num_in_plot = 9, img_shape_tuple = (28, 28)):
+    def paint_img_sequence(self, img_ndarray_list, img_name_list, img_save_dir, img_filename, dpi, max_img_num_in_plot = 9, img_shape_tuple = (28, 28)):
         # subplot_format: such as 211
         if (len(img_ndarray_list) == len(img_name_list)) and (len(img_name_list) <= max_img_num_in_plot):
             pass
@@ -183,8 +183,11 @@ class PaintNDarray(object):
             subplot_plt_list,\
             img_name_list)
 
+        # save image
+        plt.savefig(join(img_save_dir, img_filename))
+
+        # show image
         plt.show()
-        #subplot_plt_list = map()
 
 
 
@@ -218,7 +221,7 @@ train_sample_data_dir = "..//data//input//train-images-idx3-ubyte"
 train_label_data_dir = "..//data//input//train-labels-idx1-ubyte"
 
 img_save_dir = "..//data//output"
-test_img_filename = "test.jpg"
+test_img_filename = "test_img_seq.jpg"
 
 # test_img_ndarray
 img_ndarray = np.ndarray(shape = (30, 20), dtype = float)
@@ -229,6 +232,8 @@ img_name_list = ["1", "2", "3", "4", "5", "6"]
 Painter = PaintNDarray()
 Painter.paint_img_sequence(img_ndarray_list = img_ndarray_list,\
                            img_name_list = img_name_list,\
+                           img_save_dir = img_save_dir,\
+                           img_filename = test_img_filename,\
                            dpi = 1,)
 #Painter.save_one_img(img_ndarray = img_ndarray, img_save_dir = img_save_dir, img_filename = test_img_filename)
 #Painter.paint_one_img(img_ndarray = img_ndarray)
