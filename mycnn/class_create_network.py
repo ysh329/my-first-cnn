@@ -91,16 +91,37 @@ class CreateNetwork(object):
 
 
     @Decorator.log_of_function
-    def sigmoid_function(self, input_matrix):
+    def sigmoid_activation_function(self, input_matrix):
         return 1.0 / (1.0 + np.exp(-input_matrix))
 
 
 
     @Decorator.log_of_function
-    def tanh_function(self, input_matrix):
+    def tanh_activation_function(self, input_matrix):
         sub_operator1 = np.exp(input_matrix)
         sub_operator2 = np.exp(-input_matrix)
         return (sub_operator1 - sub_operator2)/(sub_operator1 + sub_operator2)
+
+
+
+    @Decorator.log_of_function
+    def relu_activation_function(self, input_matrix):
+        pass
+
+
+    @Decorator.log_of_function
+    def weaky_relu_activation_function(self, input_matrix):
+        pass
+
+
+    @Decorator.log_of_function
+    def max_out_activation_function(self, input_matrix):
+        pass
+
+
+    @Decorator.log_of_function
+    def softplus_activation_function(self, input_matrix):
+        return np.log(1 + input_matrix.dot(np.e))
 
 
 
@@ -194,8 +215,51 @@ class CreateNetwork(object):
 
 
     @Decorator.log_of_function
-    def pooling(self, input_matrix):
+    def general_pooling(self, input_matrix, pooling_mode = "max", pooling_operator_shape_tuple = (2, 2)):
+        # First, Compare the scale of variable "input_matrix" with pooling operator("pooling_operator_shape_tuple")
+        input_matrix = np.mat(input_matrix)
+        if input_matrix.shape[0] <= pooling_operator_shape_tuple[0] or input_matrix.shape[1] <= pooling_operator_shape_tuple[1]:
+            logging.error("The scale of pooling operator is bigger than input matrix.")
+            return input_matrix
+
+        logging.info("input_matrix.shape:{0}".format(input_matrix.shape))
+
+        # Second, Find all start pooling coordinate in origin matrix("input_matrix")
+        new_pooled_matrix_height = int(input_matrix.shape[0]/pooling_operator_shape_tuple[0])
+        new_pooled_matrix_width = int(input_matrix.shape[1]/pooling_operator_shape_tuple[1])
+
+        logging.info("new_pooled_matrix_height:{0}".format(new_pooled_matrix_height))
+        logging.info("new_pooled_matrix_width:{0}".format(new_pooled_matrix_width))
+
+
+        def calculate_start_pooling_coordinate_in_origin_matrix(new_pooled_matrix_height, new_pooled_matrix_width):
+            start_pooling_coordinate_tuple_list = []
+            start_height_xrange = xrange(new_pooled_matrix_height)
+            start_width_xrange = xrange(new_pooled_matrix_width)
+            for start_height in start_height_xrange:
+                cur_pooling_coordinate_tuple_list = map(lambda start_width: (start_height, start_width), start_width_xrange)
+                start_pooling_coordinate_tuple_list.extend(cur_pooling_coordinate_tuple_list)
+            return start_pooling_coordinate_tuple_list
+
+        start_pooling_coordinate_tuple_list = calculate_start_pooling_coordinate_in_origin_matrix(new_pooled_matrix_height = new_pooled_matrix_height,\
+                                                                                                  new_pooled_matrix_width = new_pooled_matrix_width)
+        logging.info("len(start_pooling_coordinate_tuple_list):{0}".format(len(start_pooling_coordinate_tuple_list)))
+        logging.info("start_pooling_coordinate_tuple_list[:3]:{0}".format(start_pooling_coordinate_tuple_list[:3]))
+
+
+        pooled_input_matrix = input_matrix
+        return pooled_input_matrix
+
+
+    @Decorator.log_of_function
+    def overlapping_pooling(self, input_matrix):
         pass
+
+
+    @Decorator.log_of_function
+    def spatial_pyramid_pooling(self, input_matrix):
+        pass
+
 
 
 
@@ -208,7 +272,7 @@ class CreateNetwork(object):
 train_sample_data_dir = "..//data//input//train-images-idx3-ubyte"
 train_label_data_dir = "..//data//input//train-labels-idx1-ubyte"
 img_save_dir = "../data/output"
-img_filename = "raw-sigmoid.jpg"
+img_filename = "raw-softplus.jpg"
 
 # Get data and one image matrix
 Net = CreateNetwork()
@@ -216,22 +280,30 @@ all_image_2d_ndarray = Net.load_image_data_set(img_data_dir = train_sample_data_
 input_matrix = all_image_2d_ndarray[0]
 #logging.info(input_matrix)
 
+"""
 # convolution
 #input_matrix = Net.tanh_function(input_matrix = input_matrix)
-input_matrix = Net.sigmoid_function(input_matrix = input_matrix)
+input_matrix = Net.softplus_activation_function(input_matrix = input_matrix)
 #input_matrix = Net.convolution(input_matrix = input_matrix)
+"""
 
 
+# pooling
+input_matrix = Net.general_pooling(input_matrix = input_matrix,\
+                                   pooling_mode = "max",\
+                                   pooling_operator_shape_tuple = (3,5))
 
+"""
 Painter = PaintNDarray()
 Painter.paint_one_img(img_ndarray = input_matrix,\
                       dpi = 1)
+
 Painter.save_one_img(img_ndarray = input_matrix,\
                      img_save_dir = img_save_dir,\
                      img_filename = img_filename,\
                      dpi = 100,\
                      img_shape_tuple = input_matrix.shape)
-
+"""
 
 
 #'''
