@@ -106,12 +106,21 @@ class CreateNetwork(object):
 
     @Decorator.log_of_function
     def relu_activation_function(self, input_matrix):
-        pass
+        return self.leaky_relu_activation_function(input_matrix = input_matrix,\
+                                                   leaky_coefficient = 1)
 
 
     @Decorator.log_of_function
-    def weaky_relu_activation_function(self, input_matrix):
-        pass
+    def leaky_relu_activation_function(self, input_matrix, leaky_coefficient):
+        ################# start #################
+        def relu(x, leak_coefficient):
+            if leaky_coefficient == 1:
+                return 0 if x <= 0 else x
+            else:
+                return 0 if x <= 0 else float(x)/leaky_coefficient
+        #################  end  #################
+        vectorized_relu = np.vectorize(relu)
+        return vectorized_relu(input_matrix, leak_coefficient = leaky_coefficient)
 
 
     @Decorator.log_of_function
@@ -222,14 +231,14 @@ class CreateNetwork(object):
             logging.error("The scale of pooling operator is bigger than input matrix.")
             return input_matrix
 
-        logging.info("input_matrix.shape:{0}".format(input_matrix.shape))
+        #logging.info("input_matrix.shape:{0}".format(input_matrix.shape))
 
         # Second, Find all start pooling coordinate in origin matrix("input_matrix")
         new_pooled_matrix_height = int(input_matrix.shape[0]/pooling_operator_shape_tuple[0])
         new_pooled_matrix_width = int(input_matrix.shape[1]/pooling_operator_shape_tuple[1])
 
-        logging.info("new_pooled_matrix_height:{0}".format(new_pooled_matrix_height))
-        logging.info("new_pooled_matrix_width:{0}".format(new_pooled_matrix_width))
+        #logging.info("new_pooled_matrix_height:{0}".format(new_pooled_matrix_height))
+        #logging.info("new_pooled_matrix_width:{0}".format(new_pooled_matrix_width))
 
 
         ################# start #################
@@ -246,19 +255,18 @@ class CreateNetwork(object):
 
         start_pooling_coordinate_tuple_list = calculate_start_pooling_coordinate_in_origin_matrix(input_matrix_shape_tuple = input_matrix.shape,\
                                                                                                   pooling_operator_shape_tuple = pooling_operator_shape_tuple)
-        logging.info("len(start_pooling_coordinate_tuple_list):{0}".format(len(start_pooling_coordinate_tuple_list)))
-        logging.info("start_pooling_coordinate_tuple_list:{0}".format(start_pooling_coordinate_tuple_list))
+        #logging.info("len(start_pooling_coordinate_tuple_list):{0}".format(len(start_pooling_coordinate_tuple_list)))
+        #logging.info("start_pooling_coordinate_tuple_list:{0}".format(start_pooling_coordinate_tuple_list))
 
 
         ################# start #################
         def calculate_pooled_matrix_according_to_start_pooling_coordinate(start_pooling_coordinate_tuple_list_in_origin_matrix, input_matrix, pooling_mode, pooling_operator_shape_tuple, new_pooled_matrix_shape_tuple):
             input_matrix = np.mat(input_matrix)
-            logging.info("input_matrix:{0}".format(input_matrix))
-
+            #logging.info("input_matrix:{0}".format(input_matrix))
 
             pooling_operator_height, pooling_operator_width = pooling_operator_shape_tuple[0], pooling_operator_shape_tuple[1]
-            logging.info("pooling_operator_matrix.height:{0}".format(pooling_operator_height))
-            logging.info("pooling_operator_width:{0}".format(pooling_operator_width))
+            #logging.info("pooling_operator_matrix.height:{0}".format(pooling_operator_height))
+            #logging.info("pooling_operator_width:{0}".format(pooling_operator_width))
 
             # Initialize a convolution matrix
             pooled_input_list = list()
@@ -320,7 +328,7 @@ class CreateNetwork(object):
 train_sample_data_dir = "..//data//input//train-images-idx3-ubyte"
 train_label_data_dir = "..//data//input//train-labels-idx1-ubyte"
 img_save_dir = "../data/output"
-img_filename = "raw-general_pooling(mean).jpg"
+img_filename = "raw-relu.jpg"
 
 # Get data and one image matrix
 Net = CreateNetwork()
@@ -328,18 +336,20 @@ all_image_2d_ndarray = Net.load_image_data_set(img_data_dir = train_sample_data_
 input_matrix = all_image_2d_ndarray[0]
 #logging.info(input_matrix)
 
-"""
+
 # convolution
 #input_matrix = Net.tanh_function(input_matrix = input_matrix)
-input_matrix = Net.softplus_activation_function(input_matrix = input_matrix)
+#input_matrix = Net.softplus_activation_function(input_matrix = input_matrix)
 #input_matrix = Net.convolution(input_matrix = input_matrix)
-"""
+input_matrix = Net.relu_activation_function(input_matrix = input_matrix)
 
 
+'''
 # pooling
 input_matrix = Net.general_pooling(input_matrix = input_matrix,\
                                    pooling_mode = "max",\
                                    pooling_operator_shape_tuple = (2, 2))
+'''
 
 #"""
 Painter = PaintNDarray()
